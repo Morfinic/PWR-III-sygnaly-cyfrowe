@@ -1,26 +1,44 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+# Stworzenie figury na wyświetlenie wykresów
 fig = plt.figure()
+# Stworzenie wykresu biegunowego przedstawiającego kręcące śię śmigło
 ax1 = fig.add_subplot(121, projection = "polar")
+# Stworzenie wykresu kartezjańskiego przedstawiające śmigło z użyciem skanera
 ax2 = fig.add_subplot(122)
+
 ax2.set_xlim([-1.5, 1.5])
 ax2.set_ylim([-1.5, 1.5])
 
+# Liczba śmigieł
 n = 5
+# Liczba skanowanych lini jednej klatki
+l = 128
+# Ilość klatek skanowanego obrazu
+fr = 256/l
+# Wysokość segmentu (sin przyjmuje wartości od -1 do 1)
+seg_height = 2/fr
+# Skanowanie zaczyna się od góry
+seg_start = 1
+
 radians = np.linspace(0, 2*np.pi, 256)
 frames = np.linspace(-32, 32, 64)
 
-while True:
-    for frame in frames:
-        for rad in radians:
-            radius = np.sin(n*rad + (frame*np.pi)/10)
-            x=np.cos(rad)*radius
-            y=np.sin(rad)*radius
+# Generowanie "obrazu" dla każdej klatki
+for frame in frames:
+    for rad in radians:
+        radius = np.sin(n*rad + (frame*np.pi)/10)
+        # Nanoszenie obrazu na wykres biegunowy
+        ax1.plot(rad, radius, "g.")
 
-            ax1.plot(rad, radius, "o")
-            ax2.plot(x, y, "*")
-        plt.pause(0.1)
-        ax1.clear()
-        ax2.clear()
-
+        # Zamiana współrzędnych biegunowych na kartezjańskie
+        x=np.cos(rad)*radius
+        y=np.sin(rad)*radius
+        # Jeśli y znajduje się w aktualnie skanowanym segmencie nanieś go na wykres
+        if(y < seg_start and y > seg_start - seg_height):
+           ax2.plot(x, y, "*")
+    # Określ nowy segment dla następnej klatki
+    seg_start = seg_start - seg_height
+    plt.pause(0.5)
+    ax1.clear()

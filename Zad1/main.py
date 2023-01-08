@@ -14,7 +14,7 @@ ax2.set_ylim(-1.5, 1.5)
 # Liczba śmigieł
 n = 5
 # Liczba skanowanych lini jednej klatki
-line = 16
+line = 8
 # Ilość klatek skanowanego obrazu
 fr = 256 / line
 # Wysokość segmentu (sin przyjmuje wartości od -1 do 1)

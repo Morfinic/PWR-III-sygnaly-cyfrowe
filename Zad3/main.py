@@ -2,8 +2,10 @@ import matplotlib.pyplot as plt
 from PIL import Image
 import math
 import include.interpolate
+import numpy as np
 
 
+@include.interpolate.time_it
 def resize_image(image, k):
     imageLength = image.size[0]
     newLength = int(imageLength * k)
@@ -20,6 +22,7 @@ def resize_image(image, k):
     return newImage
 
 
+@include.interpolate.time_it
 def rotate_image(image, angle):
     angle = math.radians(angle)
     sin = math.sin(angle)
@@ -65,7 +68,7 @@ for idx, img in enumerate(contentList, 1):
     plt.title(str(name))
     plt.imshow(image)
     plt.axis("off")
-#     image.save(f"./imgSaved/{name}.png", "PNG")
+    image.save(f"./imgSaved/{name}.png", "PNG")
 plt.show()
 
 for idx, img in enumerate(interList, 1):
@@ -74,4 +77,5 @@ for idx, img in enumerate(interList, 1):
     plt.title(str(name))
     plt.imshow(image)
     plt.axis("off")
+    plt.imsave(f"./imgSaved/{name}.png", image.astype(np.uint8))
 plt.show()

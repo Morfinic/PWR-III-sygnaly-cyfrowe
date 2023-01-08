@@ -8,7 +8,7 @@ xTransImage = np.zeros([*rawImage.shape], dtype=int)
 
 content_list = [
     [rawImage, "Raw Image"],
-    [xTransImage, "Bayer Filter"],
+    [xTransImage, "X-Trans Filter"],
 ]
 
 # Red

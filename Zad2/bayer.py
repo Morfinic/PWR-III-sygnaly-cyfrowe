@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import cv2
 from demosaic import demosaic
 
-rawImage = cv2.cvtColor(cv2.imread("img/brisket.bmp", cv2.IMREAD_COLOR), cv2.COLOR_BGR2RGB)
+rawImage = cv2.cvtColor(cv2.imread("img/strus.bmp", cv2.IMREAD_COLOR), cv2.COLOR_BGR2RGB)
 bayerImage = np.zeros([*rawImage.shape], dtype=int)
 
 content_list = [

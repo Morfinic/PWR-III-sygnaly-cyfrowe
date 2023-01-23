@@ -1,33 +1,32 @@
-from PIL import Image
 import math
 import numpy as np
 from include.time_it import time_it
 
+
 @time_it
-def resize_nearest(image, k):
-    baseSize = image.size[0]
+def resize_nearest(image, k: int):
+    baseSize = image.shape[0]
     newSize = int(baseSize * k)
-    newImage = Image.new("RGB", (newSize, newSize))
+    newImage = np.zeros((newSize, newSize, 3))
 
     for x in range(newSize):
         for y in range(newSize):
             oldX = int(np.round(x / k))
             oldY = int(np.round(y / k))
 
-
             if oldX >= baseSize:
                 oldX = baseSize - 1
             if oldY >= baseSize:
                 oldY = baseSize - 1
 
-            pixel = image.getpixel((oldX, oldY))
-            newImage.putpixel((x, y), pixel)
+            newImage[x, y] = image[oldX, oldY]
 
     return newImage
 
-# Ojcze nasz któryś jest w niebie, święć się imie twoje, przyjdź królestwo twoje
+
+# Ojcze nasz, zadziałaj
 @time_it
-def resize_bilinear(image, k):
+def resize_bilinear(image, k: int):
     baseSize = image.shape[0]
     newSize = int(baseSize * k)
     newImage = np.zeros((newSize, newSize, 3))
@@ -38,34 +37,55 @@ def resize_bilinear(image, k):
             i_int, j_int = int(orig_i), int(orig_j)
             i_frac, j_frac = orig_i - i_int, orig_j - j_int
 
-            if i_int >= 0 and i_int < baseSize - 1 and j_int >= 0 and j_int < baseSize - 1:
-                p = (1 - i_frac) * (1 - j_frac) * image[i_int, j_int] + \
-                    i_frac * (1 - j_frac) * image[i_int + 1, j_int] + \
-                    (1 - i_frac) * j_frac * image[i_int, j_int + 1] + \
-                    i_frac * j_frac * image[i_int + 1, j_int + 1]
+            if (
+                i_int >= 0
+                and i_int < baseSize - 1
+                and j_int >= 0
+                and j_int < baseSize - 1
+            ):
+                p = (
+                    (1 - i_frac) * (1 - j_frac) * image[i_int, j_int]
+                    + i_frac * (1 - j_frac) * image[i_int + 1, j_int]
+                    + (1 - i_frac) * j_frac * image[i_int, j_int + 1]
+                    + i_frac * j_frac * image[i_int + 1, j_int + 1]
+                )
             else:
                 p = image[i_int, j_int]
-            
+
             newImage[i, j] = p
-    
+
     return newImage
 
+
 @time_it
-def rotate_image(image, angle):
+def rotate_image(image, angle: int):
+    # Obliczanie zmiennych do czytelniejszych oblczeń
     angle = math.radians(angle)
     sin = math.sin(angle)
     cos = math.cos(angle)
-    width, height = image.size
-    center = (width / 2, height / 2)
-    rotatedImage = Image.new("RGB", (width, height))
+    width, height, dim = image.shape
+    # Liczenie danych nowego rozmiaru
+    # Rozmiar
+    newWidth = round(abs(width * cos) + abs(height * sin)) + 1
+    newHeight = round(abs(height * cos) + abs(width * sin)) + 1
+    # Środek oryginalnego zdjęcia
+    centerOgW = round(((height + 1) / 2) - 1)
+    centerOgH = round(((width + 1) / 2) - 1)
+    # Środek nowego zdjęcia
+    centerNewH = round(((newHeight + 1) / 2) - 1)
+    centerNewW = round(((newWidth + 1) / 2) - 1)
+    # Tworzenie zdjęcia o nowych rozmiarach
+    rotatedImage = np.zeros((newWidth, newHeight, dim))
 
     for x in range(width):
         for y in range(height):
-            newX = (x - center[0]) * cos - (y - center[1]) * sin + center[0]
-            newY = (x - center[0]) * sin + (y - center[1]) * cos + center[1]
+            yOg = width - 1 - x - centerOgH
+            xOg = height - 1 - y - centerOgW
 
-            if newX >= 0 and newX < width and newY >= 0 and newY < height:
-                rotatedImage.putpixel((int(newX), int(newY)), image.getpixel((x, y)))
+            yNew = centerNewH - round(xOg * sin + yOg * cos)
+            xNew = centerNewW - round(xOg * cos - yOg * sin)
+
+            if 0 <= xNew < newWidth and 0 <= yNew < newHeight:
+                rotatedImage[yNew, xNew] = image[y, x]
 
     return rotatedImage
-

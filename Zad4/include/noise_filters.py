@@ -45,6 +45,3 @@ def median_filter(input):
                 result[x][y][layer] = np.median(tmp)
 
     return result
-
-def bilateral_filter(input):
-    pass
